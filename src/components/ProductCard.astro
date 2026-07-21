@@ -1,0 +1,106 @@
+---
+import { formatearPrecio } from '../data/productos.js';
+const { producto } = Astro.props;
+
+const tieneDescuento = producto.precioAnterior && producto.precioAnterior > producto.precio;
+const porcentaje = tieneDescuento
+  ? Math.round((1 - producto.precio / producto.precioAnterior) * 100)
+  : 0;
+---
+
+<article class="card">
+  <a href={producto.link} target="_blank" rel="nofollow sponsored noopener" class="card-link">
+    <div class="card-img">
+      <img src={producto.imagen} alt={producto.titulo} loading="lazy" referrerpolicy="no-referrer" />
+      {tieneDescuento && <span class="badge">-{porcentaje}%</span>}
+    </div>
+    <div class="card-body">
+      <h3 class="card-titulo">{producto.titulo}</h3>
+      <div class="precios">
+        {tieneDescuento && (
+          <span class="precio-anterior">{formatearPrecio(producto.precioAnterior)}</span>
+        )}
+        <span class="precio">{formatearPrecio(producto.precio)}</span>
+      </div>
+      <span class="cta">Ver en Mercado Libre</span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .card {
+    background: var(--blanco);
+    border-radius: var(--radio);
+    overflow: hidden;
+    box-shadow: var(--sombra);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  }
+  .card-img {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: #fafafa;
+  }
+  .card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 12px;
+  }
+  .badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--verde);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .card-body {
+    padding: 12px;
+  }
+  .card-titulo {
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.35;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.4em;
+  }
+  .precios {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+  .precio-anterior {
+    font-size: 0.8rem;
+    color: var(--texto-suave);
+    text-decoration: line-through;
+  }
+  .precio {
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+  .cta {
+    display: block;
+    text-align: center;
+    background: var(--azul);
+    color: #fff;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.15s;
+  }
+  .card:hover .cta {
+    background: var(--azul-oscuro);
+  }
+</style>

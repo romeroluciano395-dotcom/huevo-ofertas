@@ -1,0 +1,79 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { categorias } from '../data/categorias.js';
+import { productosDestacados } from '../data/productos.js';
+
+const destacados = productosDestacados();
+---
+
+<Layout titulo="Huevo Ofertas — Las mejores ofertas online">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="contenedor">
+      <h1>Las mejores ofertas, elegidas para vos 🔥</h1>
+      <p>Encontrá descuentos en tecnología, hogar, deportes y mucho más.</p>
+    </div>
+  </section>
+
+  <!-- Categorías -->
+  <section class="seccion contenedor">
+    <h2 class="titulo-seccion">Explorá por categoría</h2>
+    <div class="cats">
+      {categorias.map((c) => (
+        <a href={`/categoria/${c.slug}`} class="cat">
+          <span class="cat-emoji">{c.emoji}</span>
+          <span>{c.nombre}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Destacados -->
+  <section class="seccion contenedor">
+    <h2 class="titulo-seccion">⭐ Ofertas destacadas</h2>
+    <div class="grilla">
+      {destacados.map((p) => <ProductCard producto={p} />)}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--amarillo), var(--amarillo-oscuro));
+    padding: 48px 0;
+    text-align: center;
+  }
+  .hero h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+  .hero p {
+    font-size: 1.05rem;
+    color: #444;
+  }
+  .cats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .cat {
+    background: var(--blanco);
+    border-radius: var(--radio);
+    padding: 20px 12px;
+    text-align: center;
+    box-shadow: var(--sombra);
+    font-weight: 500;
+    transition: transform 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .cat:hover {
+    transform: translateY(-3px);
+  }
+  .cat-emoji {
+    font-size: 2rem;
+  }
+</style>

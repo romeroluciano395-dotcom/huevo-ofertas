@@ -1,0 +1,70 @@
+---
+import { categorias } from '../data/categorias.js';
+---
+
+<header class="header">
+  <div class="contenedor header-inner">
+    <a href="/" class="logo">🥚 <span>Huevo<strong>Ofertas</strong></span></a>
+    <nav class="nav">
+      {categorias.map((c) => (
+        <a href={`/categoria/${c.slug}`} class="nav-link">{c.nombre}</a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    background: var(--amarillo);
+    box-shadow: var(--sombra);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    height: 60px;
+  }
+  .logo {
+    font-size: 1.35rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .logo strong {
+    color: var(--azul);
+  }
+  .nav {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    overflow-x: auto;
+  }
+  .nav-link {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .nav-link:hover {
+    background: rgba(0, 0, 0, 0.08);
+  }
+  @media (max-width: 640px) {
+    .header-inner {
+      flex-direction: column;
+      height: auto;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      gap: 10px;
+    }
+    .nav {
+      width: 100%;
+    }
+  }
+</style>

@@ -1,0 +1,68 @@
+:root {
+  --amarillo: #ffe600;
+  --amarillo-oscuro: #ffdb15;
+  --azul: #3483fa;
+  --azul-oscuro: #2968c8;
+  --verde: #00a650;
+  --texto: #333;
+  --texto-suave: #666;
+  --gris-fondo: #ededed;
+  --blanco: #fff;
+  --borde: #e6e6e6;
+  --sombra: 0 1px 4px rgba(0, 0, 0, 0.12);
+  --radio: 8px;
+  --ancho-max: 1200px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--texto);
+  background: var(--gris-fondo);
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.contenedor {
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.seccion {
+  padding: 32px 0;
+}
+
+.titulo-seccion {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: var(--texto);
+}
+
+/* Grilla de productos */
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 480px) {
+  .grilla {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+}

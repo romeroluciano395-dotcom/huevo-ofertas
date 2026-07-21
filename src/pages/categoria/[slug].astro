@@ -1,0 +1,43 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { categorias } from '../../data/categorias.js';
+import { productosPorCategoria } from '../../data/productos.js';
+
+// Genera una página por cada categoría de categorias.js
+export function getStaticPaths() {
+  return categorias.map((c) => ({
+    params: { slug: c.slug },
+    props: { categoria: c },
+  }));
+}
+
+const { categoria } = Astro.props;
+const productos = productosPorCategoria(categoria.slug);
+---
+
+<Layout
+  titulo={`${categoria.nombre} — Huevo Ofertas`}
+  descripcion={`Las mejores ofertas de ${categoria.nombre} en Mercado Libre.`}
+>
+  <section class="seccion contenedor">
+    <h1 class="titulo-seccion">{categoria.emoji} {categoria.nombre}</h1>
+    {productos.length > 0 ? (
+      <div class="grilla">
+        {productos.map((p) => <ProductCard producto={p} />)}
+      </div>
+    ) : (
+      <p class="vacio">Todavía no hay productos en esta categoría. ¡Pronto sumamos ofertas!</p>
+    )}
+  </section>
+</Layout>
+
+<style>
+  .vacio {
+    background: var(--blanco);
+    padding: 32px;
+    border-radius: var(--radio);
+    text-align: center;
+    color: var(--texto-suave);
+  }
+</style>
