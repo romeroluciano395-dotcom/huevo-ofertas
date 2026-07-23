@@ -1,17 +1,38 @@
 :root {
+  /* Marca */
   --amarillo: #ffe600;
   --amarillo-oscuro: #ffdb15;
   --azul: #3483fa;
   --azul-oscuro: #2968c8;
   --verde: #00a650;
-  --texto: #333;
-  --texto-suave: #666;
-  --gris-fondo: #ededed;
+  --rojo: #e63946;
+  --naranja: #ff6d00;
+
+  /* Neutros */
+  --texto: #1a1a1a;
+  --texto-suave: #6b7280;
+  --gris-fondo: #f4f5f7;
   --blanco: #fff;
-  --borde: #e6e6e6;
-  --sombra: 0 1px 4px rgba(0, 0, 0, 0.12);
-  --radio: 8px;
+  --borde: #e6e8eb;
+
+  /* Elevación */
+  --sombra: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --sombra-media: 0 6px 20px rgba(0, 0, 0, 0.10);
+  --sombra-fuerte: 0 12px 32px rgba(0, 0, 0, 0.16);
+
+  /* Formas y medidas */
+  --radio: 12px;
+  --radio-sm: 8px;
   --ancho-max: 1200px;
+
+  /* Escala de espaciado */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
 }
 
 * {
@@ -20,11 +41,17 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--texto);
   background: var(--gris-fondo);
-  line-height: 1.5;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -37,32 +64,70 @@ img {
   display: block;
 }
 
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
 .contenedor {
   max-width: var(--ancho-max);
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 var(--sp-4);
 }
 
 .seccion {
-  padding: 32px 0;
+  padding: var(--sp-6) 0;
 }
 
 .titulo-seccion {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: var(--sp-5);
   color: var(--texto);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
 }
 
 /* Grilla de productos */
 .grilla {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--sp-4);
 }
 
 @media (max-width: 480px) {
   .grilla {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-3);
   }
+  .titulo-seccion {
+    font-size: 1.2rem;
+  }
+}
+
+/* Utilidad: chip / botón pastilla reutilizable */
+.chip {
+  border: 1px solid var(--borde);
+  background: var(--blanco);
+  color: var(--texto);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.chip:hover {
+  border-color: var(--azul);
+  color: var(--azul);
+}
+.chip.activo {
+  background: var(--azul);
+  border-color: var(--azul);
+  color: #fff;
 }

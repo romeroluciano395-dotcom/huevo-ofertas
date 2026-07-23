@@ -2,17 +2,27 @@
 import Layout from '../layouts/Layout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import { categorias } from '../data/categorias.js';
-import { productosDestacados } from '../data/productos.js';
+import { productos, productosDestacados, ofertasDelDia } from '../data/productos.js';
 
 const destacados = productosDestacados();
+const delDia = ofertasDelDia(4);
+const todos = productos;
 ---
 
-<Layout titulo="Huevo Ofertas — Las mejores ofertas online">
+<Layout titulo="Huevo Ofertas — Las mejores ofertas online de Mercado Libre">
   <!-- Hero -->
   <section class="hero">
-    <div class="contenedor">
-      <h1>Las mejores ofertas, elegidas para vos 🔥</h1>
-      <p>Encontrá descuentos en tecnología, hogar, deportes y mucho más.</p>
+    <div class="contenedor hero-inner">
+      <h1>Las mejores ofertas, <span>elegidas para vos</span> 🔥</h1>
+      <p>Reunimos los mejores precios de Mercado Libre en tecnología, salud, hogar, belleza y más. Comprá seguro, directo en Mercado Libre.</p>
+    </div>
+  </section>
+
+  <!-- Ofertas del día -->
+  <section class="seccion contenedor">
+    <h2 class="titulo-seccion">⚡ Ofertas del día</h2>
+    <div class="grilla">
+      {delDia.map((p) => <ProductCard producto={p} />)}
     </div>
   </section>
 
@@ -29,51 +39,180 @@ const destacados = productosDestacados();
     </div>
   </section>
 
-  <!-- Destacados -->
+  <!-- Buscador + filtros + todos los productos -->
   <section class="seccion contenedor">
-    <h2 class="titulo-seccion">⭐ Ofertas destacadas</h2>
-    <div class="grilla">
-      {destacados.map((p) => <ProductCard producto={p} />)}
+    <h2 class="titulo-seccion">🔎 Buscá tu producto</h2>
+
+    <div class="buscador">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="search" id="input-busqueda" placeholder="Buscar por nombre… (ej: auriculares, magnesio)" autocomplete="off" />
     </div>
+
+    <div class="filtros" id="filtros">
+      <button class="chip activo" data-filtro="todas">Todas</button>
+      {categorias.map((c) => (
+        <button class="chip" data-filtro={c.slug}>{c.emoji} {c.nombre}</button>
+      ))}
+    </div>
+
+    <div class="grilla" id="grilla-todos">
+      {todos.map((p) => <ProductCard producto={p} />)}
+    </div>
+
+    <p id="sin-resultados" class="sin-resultados" hidden>
+      No encontramos productos con esa búsqueda. Probá con otra palabra.
+    </p>
   </section>
 </Layout>
+
+<script>
+  const input = document.getElementById('input-busqueda');
+  const chips = document.querySelectorAll('#filtros .chip');
+  const cards = document.querySelectorAll('#grilla-todos .card');
+  const sinResultados = document.getElementById('sin-resultados');
+
+  let categoriaActiva = 'todas';
+  let texto = '';
+
+  function aplicar() {
+    let visibles = 0;
+    cards.forEach((card) => {
+      const coincideCat = categoriaActiva === 'todas' || card.dataset.categoria === categoriaActiva;
+      const coincideTexto = !texto || card.dataset.nombre.includes(texto);
+      const mostrar = coincideCat && coincideTexto;
+      card.style.display = mostrar ? '' : 'none';
+      if (mostrar) visibles++;
+    });
+    sinResultados.hidden = visibles > 0;
+  }
+
+  input?.addEventListener('input', (e) => {
+    texto = e.target.value.trim().toLowerCase();
+    aplicar();
+  });
+
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.classList.remove('activo'));
+      chip.classList.add('activo');
+      categoriaActiva = chip.dataset.filtro;
+      aplicar();
+    });
+  });
+</script>
 
 <style>
   .hero {
     background: linear-gradient(135deg, var(--amarillo), var(--amarillo-oscuro));
-    padding: 48px 0;
+    padding: var(--sp-7) 0;
+  }
+  .hero-inner {
     text-align: center;
   }
   .hero h1 {
-    font-size: 2rem;
-    margin-bottom: 8px;
+    font-size: 2.3rem;
+    font-weight: 800;
+    margin-bottom: var(--sp-3);
+    max-width: 720px;
+    margin-inline: auto;
+  }
+  .hero h1 span {
+    text-decoration: underline;
+    text-decoration-color: rgba(0, 0, 0, 0.25);
+    text-underline-offset: 4px;
   }
   .hero p {
     font-size: 1.05rem;
-    color: #444;
+    color: #3a3a3a;
+    max-width: 640px;
+    margin: 0 auto;
   }
+  @media (max-width: 480px) {
+    .hero { padding: var(--sp-6) 0; }
+    .hero h1 { font-size: 1.6rem; }
+    .hero p { font-size: 0.95rem; }
+  }
+
   .cats {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--sp-3);
+  }
+  @media (max-width: 480px) {
+    .cats { grid-template-columns: repeat(3, 1fr); }
   }
   .cat {
     background: var(--blanco);
     border-radius: var(--radio);
-    padding: 20px 12px;
+    padding: var(--sp-5) var(--sp-3);
     text-align: center;
     box-shadow: var(--sombra);
-    font-weight: 500;
-    transition: transform 0.15s;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: transform 0.15s, box-shadow 0.15s;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: var(--sp-2);
   }
   .cat:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
+    box-shadow: var(--sombra-media);
   }
   .cat-emoji {
     font-size: 2rem;
+  }
+
+  /* Buscador */
+  .buscador {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    padding: 0 18px;
+    box-shadow: var(--sombra);
+    margin-bottom: var(--sp-4);
+    max-width: 560px;
+  }
+  .buscador svg {
+    color: var(--texto-suave);
+    flex-shrink: 0;
+  }
+  .buscador input {
+    border: none;
+    outline: none;
+    padding: 14px 12px;
+    font-size: 1rem;
+    width: 100%;
+    background: transparent;
+    font-family: inherit;
+  }
+
+  /* Filtros */
+  .filtros {
+    display: flex;
+    gap: var(--sp-2);
+    flex-wrap: wrap;
+    margin-bottom: var(--sp-5);
+  }
+  @media (max-width: 640px) {
+    .filtros {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+    .filtros::-webkit-scrollbar { display: none; }
+  }
+
+  .sin-resultados {
+    text-align: center;
+    color: var(--texto-suave);
+    background: var(--blanco);
+    padding: var(--sp-6);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
   }
 </style>

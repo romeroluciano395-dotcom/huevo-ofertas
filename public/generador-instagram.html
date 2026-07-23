@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🥚 Generador de placas para Instagram — Huevo Ofertas</title>
+<style>
+  :root{
+    --amarillo:#ffe600; --azul:#3483fa; --azul-osc:#2968c8;
+    --rojo:#e63946; --texto:#1a1a1a; --suave:#6b7280; --borde:#e6e8eb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+  body{background:#f4f5f7;color:var(--texto);padding:24px;line-height:1.5}
+  h1{font-size:1.4rem;margin-bottom:4px}
+  .sub{color:var(--suave);margin-bottom:24px;font-size:.95rem}
+  .wrap{display:grid;grid-template-columns:380px 1fr;gap:32px;max-width:1000px;margin:0 auto;align-items:start}
+  @media(max-width:820px){.wrap{grid-template-columns:1fr}}
+  .panel{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  label{display:block;font-size:.85rem;font-weight:600;margin-bottom:14px;color:#444}
+  input[type=text],input[type=number],input[type=url]{width:100%;padding:9px 11px;margin-top:4px;
+    border:1px solid var(--borde);border-radius:8px;font-size:.95rem}
+  .fila{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .check{display:flex;align-items:center;gap:8px;font-weight:500}
+  .check input{width:auto}
+  .btn{border:none;border-radius:8px;padding:12px 18px;font-size:.95rem;font-weight:700;
+    cursor:pointer;color:#fff;width:100%;margin-top:6px}
+  .btn-azul{background:var(--azul)} .btn-azul:hover{background:var(--azul-osc)}
+  .previewbox{text-align:center}
+  canvas{width:100%;max-width:440px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.15);background:#fff}
+  .hint{font-size:.8rem;color:var(--suave);margin-top:10px}
+  .err{color:var(--rojo);font-size:.85rem;margin-top:8px;min-height:1em}
+</style>
+</head>
+<body>
+  <h1>🥚 Generador de placas para Instagram</h1>
+  <p class="sub">Pegá los datos del producto, se genera la placa cuadrada (1080×1080) con tu marca. Después la descargás y la subís a Instagram.</p>
+
+  <div class="wrap">
+    <div class="panel">
+      <label>URL de la foto (de Mercado Libre)
+        <input type="url" id="f-img" placeholder="https://http2.mlstatic.com/...webp" />
+      </label>
+      <label>Título del producto
+        <input type="text" id="f-titulo" placeholder="Auriculares Xiaomi Redmi Buds 6" />
+      </label>
+      <div class="fila">
+        <label>Precio
+          <input type="number" id="f-precio" placeholder="23999" />
+        </label>
+        <label>Precio anterior <span style="color:#999;font-weight:400">(opcional)</span>
+          <input type="number" id="f-anterior" placeholder="39999" />
+        </label>
+      </div>
+      <label class="check"><input type="checkbox" id="f-bio" checked /> Mostrar "Link en la bio"</label>
+      <div style="height:12px"></div>
+      <button class="btn btn-azul" id="btn-descargar">⬇️ Descargar placa (PNG)</button>
+      <div class="err" id="err"></div>
+      <p class="hint">Tip: en ML, clic derecho sobre la foto → "Copiar dirección de imagen" y pegala arriba.</p>
+    </div>
+
+    <div class="previewbox">
+      <canvas id="lienzo" width="1080" height="1080"></canvas>
+      <p class="hint">Vista previa en vivo — se actualiza al escribir.</p>
+    </div>
+  </div>
+
+<script>
+const $=id=>document.getElementById(id);
+const cv=$('lienzo'), ctx=cv.getContext('2d');
+let img=null;
+
+function fmt(v){
+  v=Number(v)||0;
+  return v.toLocaleString('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0});
+}
+
+function cargarImg(url){
+  return new Promise(res=>{
+    if(!url){img=null;return res();}
+    const i=new Image();
+    i.crossOrigin='anonymous';
+    i.referrerPolicy='no-referrer';
+    i.onload=()=>{img=i;res();};
+    i.onerror=()=>{img=null;res();};
+    i.src=url;
+  });
+}
+
+function redondear(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function wrap(texto,x,y,maxW,lh,maxLineas){
+  const palabras=texto.split(' ');let linea='',lineas=[];
+  for(const p of palabras){
+    const test=linea?linea+' '+p:p;
+    if(ctx.measureText(test).width>maxW && linea){lineas.push(linea);linea=p;}
+    else linea=test;
+  }
+  if(linea)lineas.push(linea);
+  lineas=lineas.slice(0,maxLineas);
+  lineas.forEach((l,i)=>ctx.fillText(l,x,y+i*lh));
+  return lineas.length;
+}
+
+function dibujar(){
+  const titulo=$('f-titulo').value||'Título del producto';
+  const precio=$('f-precio').value;
+  const anterior=$('f-anterior').value;
+  const bio=$('f-bio').checked;
+  const tieneDesc=anterior && Number(anterior)>Number(precio);
+  const pct=tieneDesc?Math.round((1-Number(precio)/Number(anterior))*100):0;
+
+  // Fondo
+  ctx.fillStyle='#f4f5f7';ctx.fillRect(0,0,1080,1080);
+
+  // Barra superior amarilla
+  ctx.fillStyle='#ffe600';ctx.fillRect(0,0,1080,150);
+  ctx.fillStyle='#1a1a1a';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='700 60px Segoe UI, system-ui, sans-serif';
+  ctx.fillText('🥚 Huevo Ofertas',540,78);
+
+  // Tarjeta blanca para la imagen
+  ctx.fillStyle='#fff';redondear(60,190,960,560,24);ctx.fill();
+  if(img){
+    const pad=50, boxW=960-pad*2, boxH=560-pad*2;
+    const escala=Math.min(boxW/img.width,boxH/img.height);
+    const w=img.width*escala,h=img.height*escala;
+    ctx.drawImage(img,540-w/2,190+280-h/2,w,h);
+  }else{
+    ctx.fillStyle='#c9ccd1';ctx.font='400 34px Segoe UI';
+    ctx.fillText('Pegá la URL de la foto →',540,470);
+  }
+
+  // Badge descuento
+  if(tieneDesc){
+    ctx.fillStyle='#e63946';ctx.beginPath();ctx.arc(940,300,78,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='800 46px Segoe UI';ctx.fillText('-'+pct+'%',940,300);
+  }
+
+  // Título
+  ctx.fillStyle='#1a1a1a';ctx.font='600 44px Segoe UI, system-ui, sans-serif';
+  const nLineas=wrap(titulo,540,830,940,54,2);
+
+  // Precios
+  const yPrecio = nLineas>1 ? 960 : 930;
+  if(tieneDesc){
+    ctx.fillStyle='#9aa0a6';ctx.font='400 36px Segoe UI';
+    ctx.fillText(fmt(anterior),540,yPrecio-6);
+    ctx.save();
+    const w=ctx.measureText(fmt(anterior)).width;
+    ctx.strokeStyle='#9aa0a6';ctx.lineWidth=3;ctx.beginPath();
+    ctx.moveTo(540-w/2,yPrecio-6);ctx.lineTo(540+w/2,yPrecio-6);ctx.stroke();ctx.restore();
+  }
+  ctx.fillStyle='#3483fa';ctx.font='800 96px Segoe UI, system-ui, sans-serif';
+  ctx.fillText(fmt(precio||0),540,yPrecio+58);
+
+  // Barra CTA inferior
+  if(bio){
+    ctx.fillStyle='#3483fa';ctx.fillRect(0,980,1080,100);
+    ctx.fillStyle='#fff';ctx.font='700 42px Segoe UI, system-ui, sans-serif';
+    ctx.fillText('🔗 Link en la bio para comprar',540,1032);
+  }
+}
+
+async function actualizar(){
+  await cargarImg($('f-img').value.trim());
+  const url=$('f-img').value.trim();
+  $('err').textContent = (url && !img) ? 'No se pudo cargar esa imagen. Revisá la URL.' : '';
+  dibujar();
+}
+
+['f-img','f-titulo','f-precio','f-anterior'].forEach(id=>$(id).addEventListener('input',actualizar));
+$('f-bio').addEventListener('change',dibujar);
+
+$('btn-descargar').addEventListener('click',()=>{
+  try{
+    const a=document.createElement('a');
+    a.download=('huevo-ofertas-'+($('f-titulo').value||'producto')).toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)+'.png';
+    a.href=cv.toDataURL('image/png');
+    a.click();
+  }catch(e){
+    $('err').textContent='No se pudo descargar (problema con la imagen). Probá con otra foto.';
+  }
+});
+
+dibujar();
+</script>
+</body>
+</html>

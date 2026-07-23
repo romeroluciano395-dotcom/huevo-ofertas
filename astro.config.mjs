@@ -1,7 +1,9 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
-// Cambiá 'site' por tu dominio real cuando lo tengas (ayuda al SEO).
+// URL pública del sitio (importante para SEO, canonical y sitemap).
 export default defineConfig({
-  site: 'https://tu-dominio.com',
+  site: 'https://huevo-ofertas.netlify.app',
+  integrations: [sitemap()],
 });

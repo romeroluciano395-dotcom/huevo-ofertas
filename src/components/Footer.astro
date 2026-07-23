@@ -1,31 +1,123 @@
 ---
+import { categorias } from '../data/categorias.js';
 const anio = new Date().getFullYear();
 ---
 
 <footer class="footer">
-  <div class="contenedor">
-    <p>© {anio} Huevo Ofertas — Sitio de afiliados.</p>
-    <p class="disclaimer">
-      Este sitio contiene enlaces de afiliado. Al comprar a través de ellos podemos
-      recibir una comisión, sin costo adicional para vos. No somos Mercado Libre.
-    </p>
+  <div class="contenedor footer-grid">
+    <!-- Marca + explicación -->
+    <div class="footer-col footer-marca">
+      <span class="footer-logo">🥚 Huevo<strong>Ofertas</strong></span>
+      <p>
+        Reunimos las mejores ofertas de Mercado Libre en un solo lugar. No vendemos
+        productos: cuando tocás una oferta, la compra la hacés <strong>directamente y de
+        forma segura en Mercado Libre</strong>.
+      </p>
+    </div>
+
+    <!-- Categorías -->
+    <nav class="footer-col">
+      <h3>Categorías</h3>
+      <ul>
+        {categorias.map((c) => (
+          <li><a href={`/categoria/${c.slug}`}>{c.emoji} {c.nombre}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <!-- Información -->
+    <nav class="footer-col">
+      <h3>Información</h3>
+      <ul>
+        <li><a href="/">Inicio</a></li>
+        <li><a href="/privacidad">Política de privacidad</a></li>
+        <li><a href="mailto:romeroluciano395@gmail.com">Contacto</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="footer-disclaimer">
+    <div class="contenedor">
+      <p>
+        <strong>Aviso de afiliados:</strong> Huevo Ofertas participa en el programa de
+        afiliados de Mercado Libre. Podemos recibir una comisión por las compras
+        realizadas a través de nuestros enlaces, <strong>sin ningún costo adicional para vos</strong>.
+        Los precios y la disponibilidad se muestran a título informativo y pueden variar;
+        el precio final es siempre el que figura en Mercado Libre. Este sitio no es
+        Mercado Libre ni está operado por Mercado Libre.
+      </p>
+      <p class="copy">© {anio} Huevo Ofertas — Todos los derechos reservados.</p>
+    </div>
   </div>
 </footer>
 
 <style>
   .footer {
-    background: #2d2d2d;
-    color: #ccc;
-    padding: 28px 0;
-    margin-top: 40px;
-    font-size: 0.85rem;
+    background: #1e1e1e;
+    color: #cfcfcf;
+    margin-top: var(--sp-7);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: var(--sp-6);
+    padding: var(--sp-7) var(--sp-4);
+  }
+  @media (max-width: 700px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: var(--sp-5);
+    }
+  }
+  .footer-logo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    display: inline-block;
+    margin-bottom: var(--sp-3);
+  }
+  .footer-logo strong {
+    color: var(--amarillo);
+  }
+  .footer-marca p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    max-width: 420px;
+  }
+  .footer-col h3 {
+    color: #fff;
+    font-size: 0.95rem;
+    margin-bottom: var(--sp-3);
+  }
+  .footer-col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+  .footer-col a {
+    font-size: 0.9rem;
+    color: #cfcfcf;
+    transition: color 0.15s;
+  }
+  .footer-col a:hover {
+    color: var(--amarillo);
+  }
+  .footer-disclaimer {
+    border-top: 1px solid #333;
+    padding: var(--sp-5) var(--sp-4);
+    background: #171717;
+  }
+  .footer-disclaimer p {
+    font-size: 0.78rem;
+    color: #9a9a9a;
+    line-height: 1.6;
+    max-width: 900px;
+    margin: 0 auto;
     text-align: center;
   }
-  .disclaimer {
-    margin-top: 8px;
-    color: #999;
-    max-width: 640px;
-    margin-left: auto;
-    margin-right: auto;
+  .footer-disclaimer .copy {
+    margin-top: var(--sp-3);
+    color: #7a7a7a;
   }
 </style>

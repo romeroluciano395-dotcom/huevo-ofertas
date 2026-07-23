@@ -1,18 +1,18 @@
 ---
-import { formatearPrecio } from '../data/productos.js';
+import { formatearPrecio, porcentajeDescuento, etiquetaProducto } from '../data/productos.js';
 const { producto } = Astro.props;
 
-const tieneDescuento = producto.precioAnterior && producto.precioAnterior > producto.precio;
-const porcentaje = tieneDescuento
-  ? Math.round((1 - producto.precio / producto.precioAnterior) * 100)
-  : 0;
+const descuento = porcentajeDescuento(producto);
+const tieneDescuento = descuento > 0;
+const etiqueta = etiquetaProducto(producto);
 ---
 
-<article class="card">
+<article class="card" data-categoria={producto.categoria} data-nombre={producto.titulo.toLowerCase()}>
   <a href={producto.link} target="_blank" rel="nofollow sponsored noopener" class="card-link">
     <div class="card-img">
-      <img src={producto.imagen} alt={producto.titulo} loading="lazy" referrerpolicy="no-referrer" />
-      {tieneDescuento && <span class="badge">-{porcentaje}%</span>}
+      <img src={producto.imagen} alt={producto.titulo} loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+      {etiqueta && <span class={`etiqueta etiqueta-${etiqueta.tipo}`}>{etiqueta.texto}</span>}
+      {tieneDescuento && <span class="badge">-{descuento}%</span>}
     </div>
     <div class="card-body">
       <h3 class="card-titulo">{producto.titulo}</h3>
@@ -21,8 +21,12 @@ const porcentaje = tieneDescuento
           <span class="precio-anterior">{formatearPrecio(producto.precioAnterior)}</span>
         )}
         <span class="precio">{formatearPrecio(producto.precio)}</span>
+        {tieneDescuento && <span class="ahorro">Ahorrás {formatearPrecio(producto.precioAnterior - producto.precio)}</span>}
       </div>
-      <span class="cta">Ver en Mercado Libre</span>
+      <span class="cta">
+        Ver oferta en Mercado Libre
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
     </div>
   </a>
 </article>
@@ -33,11 +37,18 @@ const porcentaje = tieneDescuento
     border-radius: var(--radio);
     overflow: hidden;
     box-shadow: var(--sombra);
-    transition: transform 0.15s, box-shadow 0.15s;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    display: flex;
+    flex-direction: column;
   }
   .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+    transform: translateY(-4px);
+    box-shadow: var(--sombra-media);
+  }
+  .card-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
   .card-img {
     position: relative;
@@ -48,59 +59,98 @@ const porcentaje = tieneDescuento
     width: 100%;
     height: 100%;
     object-fit: contain;
-    padding: 12px;
+    padding: 14px;
   }
+  /* Etiquetas (arriba a la izquierda) */
+  .etiqueta {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+  .etiqueta-descuento { background: var(--rojo); }
+  .etiqueta-vendido { background: var(--naranja); }
+  .etiqueta-oferta { background: var(--verde); }
+  .etiqueta-custom { background: var(--azul); }
+  /* Badge de % (abajo a la derecha) */
   .badge {
     position: absolute;
-    top: 8px;
-    left: 8px;
-    background: var(--verde);
+    bottom: 10px;
+    right: 10px;
+    background: var(--rojo);
     color: #fff;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 4px 9px;
+    border-radius: var(--radio-sm);
   }
   .card-body {
-    padding: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
   .card-titulo {
     font-size: 0.9rem;
-    font-weight: 400;
+    font-weight: 500;
     line-height: 1.35;
-    margin-bottom: 8px;
+    margin-bottom: var(--sp-3);
+    color: var(--texto);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    min-height: 2.4em;
+    min-height: 2.5em;
   }
   .precios {
     display: flex;
     flex-direction: column;
-    margin-bottom: 10px;
+    margin-bottom: var(--sp-3);
+    margin-top: auto;
   }
   .precio-anterior {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     color: var(--texto-suave);
     text-decoration: line-through;
   }
   .precio {
-    font-size: 1.25rem;
-    font-weight: 500;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--texto);
+    letter-spacing: -0.02em;
+  }
+  .ahorro {
+    font-size: 0.76rem;
+    color: var(--verde);
+    font-weight: 600;
+    margin-top: 2px;
   }
   .cta {
-    display: block;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     background: var(--azul);
     color: #fff;
-    padding: 11px 8px;
-    border-radius: 6px;
+    padding: 12px 8px;
+    border-radius: var(--radio-sm);
     font-size: 0.9rem;
-    font-weight: 500;
-    transition: background 0.15s;
+    font-weight: 700;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .cta svg {
+    transition: transform 0.15s;
   }
   .card:hover .cta {
     background: var(--azul-oscuro);
+  }
+  .card:hover .cta svg {
+    transform: translateX(3px);
   }
 </style>

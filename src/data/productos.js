@@ -7,6 +7,11 @@
 //  - link:      ⚠️ pegá acá TU link de afiliado de Mercado Libre
 //  - destacado: true = aparece en la home. false = solo en su categoría.
 //  - imagen:    URL de la foto (podés copiar la del producto en ML)
+//
+//  CAMPOS OPCIONALES (podés no ponerlos):
+//  - masVendido: true  → muestra la etiqueta "Más vendido"
+//  - etiqueta: 'texto'  → etiqueta personalizada (ej: 'Nuevo', 'Últimas unidades')
+//  - precioAnterior: número → muestra el % de descuento y "Gran descuento" si es alto
 // ─────────────────────────────────────────────────────────────
 
 export const productos = [
@@ -19,6 +24,7 @@ export const productos = [
     imagen: 'https://http2.mlstatic.com/D_NQ_NP_2X_802305-MLA95679505222_102025-F.webp',
     link: 'https://www.mercadolibre.com.ar/auriculares-inalambricos-xiaomi-redmi-buds-6-play-negro/p/MLA39962085?pdp_filters=item_id%3AMLA2053493606&matt_tool=89488245&ua=JBsyYG55EI2Yq9X0WC6ldt2_nRdswyNr0sZoS8XR_KzSxeM8',
     destacado: true,
+    masVendido: true,
   },
   {
     id: 9,
@@ -129,6 +135,7 @@ export const productos = [
     imagen: 'https://http2.mlstatic.com/D_NQ_NP_2X_807657-MLA106594620491_022026-F.webp',
     link: 'https://www.mercadolibre.com.ar/kit-de-internet-via-satelite-starlink-mini-x/p/MLA65276331?pdp_filters=item_id%3AMLA2842747978&matt_tool=89488245&ua=utZO2NlqEClR9VtTNtv6iXJcWW2aSzu6Qa9VhfY0-_yT9j-s',
     destacado: true,
+    masVendido: true,
   },
   {
     id: 20,
@@ -156,4 +163,31 @@ export function formatearPrecio(valor) {
     currency: 'ARS',
     maximumFractionDigits: 0,
   });
+}
+
+// Porcentaje de descuento (0 si no hay precioAnterior válido).
+export function porcentajeDescuento(p) {
+  if (!p.precioAnterior || p.precioAnterior <= p.precio) return 0;
+  return Math.round((1 - p.precio / p.precioAnterior) * 100);
+}
+
+// Devuelve la etiqueta a mostrar en la tarjeta (o null).
+// Prioridad: etiqueta personalizada > gran descuento > más vendido > oferta.
+export function etiquetaProducto(p) {
+  if (p.etiqueta) return { texto: p.etiqueta, tipo: 'custom' };
+  const desc = porcentajeDescuento(p);
+  if (desc >= 30) return { texto: 'Gran descuento', tipo: 'descuento' };
+  if (p.masVendido) return { texto: 'Más vendido', tipo: 'vendido' };
+  if (desc > 0) return { texto: 'Oferta', tipo: 'oferta' };
+  return null;
+}
+
+// "Ofertas del día": primero los que tienen descuento real, luego los más
+// vendidos, luego destacados. Devuelve como máximo `cantidad` productos.
+export function ofertasDelDia(cantidad = 4) {
+  const conDescuento = productos.filter((p) => porcentajeDescuento(p) > 0);
+  const vendidos = productos.filter((p) => p.masVendido);
+  const destacados = productos.filter((p) => p.destacado);
+  const orden = [...new Set([...conDescuento, ...vendidos, ...destacados])];
+  return orden.slice(0, cantidad);
 }

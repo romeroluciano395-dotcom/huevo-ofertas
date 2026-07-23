@@ -17,11 +17,25 @@ const productos = productosPorCategoria(categoria.slug);
 ---
 
 <Layout
-  titulo={`${categoria.nombre} — Huevo Ofertas`}
-  descripcion={`Las mejores ofertas de ${categoria.nombre} en Mercado Libre.`}
+  titulo={`${categoria.nombre} — Ofertas en Mercado Libre | Huevo Ofertas`}
+  descripcion={`Las mejores ofertas de ${categoria.nombre} en Mercado Libre, elegidas para vos. Precios y descuentos actualizados en Huevo Ofertas.`}
 >
   <section class="seccion contenedor">
-    <h1 class="titulo-seccion">{categoria.emoji} {categoria.nombre}</h1>
+    <nav class="breadcrumb" aria-label="Migas de pan">
+      <a href="/">Inicio</a>
+      <span>›</span>
+      <span aria-current="page">{categoria.nombre}</span>
+    </nav>
+
+    <header class="cat-header">
+      <h1 class="titulo-seccion">{categoria.emoji} {categoria.nombre}</h1>
+      <p class="cat-desc">
+        {productos.length > 0
+          ? `${productos.length} ${productos.length === 1 ? 'oferta seleccionada' : 'ofertas seleccionadas'} de ${categoria.nombre}. Comprá directo y seguro en Mercado Libre.`
+          : ''}
+      </p>
+    </header>
+
     {productos.length > 0 ? (
       <div class="grilla">
         {productos.map((p) => <ProductCard producto={p} />)}
@@ -33,11 +47,33 @@ const productos = productosPorCategoria(categoria.slug);
 </Layout>
 
 <style>
+  .breadcrumb {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+    margin-bottom: var(--sp-4);
+  }
+  .breadcrumb a:hover {
+    color: var(--azul);
+  }
+  .cat-header {
+    margin-bottom: var(--sp-5);
+  }
+  .cat-header .titulo-seccion {
+    margin-bottom: var(--sp-2);
+  }
+  .cat-desc {
+    color: var(--texto-suave);
+    font-size: 0.95rem;
+  }
   .vacio {
     background: var(--blanco);
-    padding: 32px;
+    padding: var(--sp-6);
     border-radius: var(--radio);
     text-align: center;
     color: var(--texto-suave);
+    box-shadow: var(--sombra);
   }
 </style>

@@ -1,0 +1,106 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  titulo="Política de Privacidad — Huevo Ofertas"
+  descripcion="Política de privacidad y aviso de afiliados de Huevo Ofertas."
+>
+  <section class="seccion contenedor legal">
+    <nav class="breadcrumb" aria-label="Migas de pan">
+      <a href="/">Inicio</a>
+      <span>›</span>
+      <span aria-current="page">Política de privacidad</span>
+    </nav>
+
+    <h1>Política de Privacidad</h1>
+    <p class="fecha">Última actualización: {new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long' })}</p>
+
+    <h2>Quiénes somos</h2>
+    <p>
+      Huevo Ofertas es un sitio que reúne y recomienda ofertas de productos disponibles en
+      Mercado Libre. No vendemos productos ni procesamos pagos: toda compra se realiza
+      directamente en el sitio de Mercado Libre.
+    </p>
+
+    <h2>Aviso de afiliados</h2>
+    <p>
+      Participamos en el programa de afiliados de Mercado Libre. Esto significa que, cuando
+      hacés clic en un enlace de nuestro sitio y realizás una compra en Mercado Libre,
+      podemos recibir una comisión. <strong>Esto no representa ningún costo adicional para vos</strong>:
+      pagás exactamente el mismo precio que figura en Mercado Libre.
+    </p>
+    <p>
+      Los precios, descuentos y disponibilidad que mostramos son a título informativo y
+      pueden cambiar en cualquier momento. El precio y las condiciones finales son siempre
+      los que figuran en la página del producto en Mercado Libre al momento de la compra.
+    </p>
+
+    <h2>Datos que recopilamos</h2>
+    <p>
+      Este sitio no requiere registro ni te pide datos personales. No recopilamos nombres,
+      correos electrónicos ni información de pago. Podemos utilizar herramientas básicas de
+      estadísticas de visitas (como cantidad de visitantes o páginas más vistas) que no te
+      identifican de forma personal.
+    </p>
+
+    <h2>Enlaces externos</h2>
+    <p>
+      Nuestro sitio contiene enlaces a Mercado Libre. Al hacer clic en ellos, salís de Huevo
+      Ofertas y quedás sujeto a las políticas de privacidad y términos de uso de Mercado
+      Libre, sobre los cuales no tenemos control.
+    </p>
+
+    <h2>Contacto</h2>
+    <p>
+      Si tenés dudas sobre esta política o sobre el sitio, escribinos a
+      <a href="mailto:romeroluciano395@gmail.com">romeroluciano395@gmail.com</a>.
+    </p>
+
+    <p class="volver"><a href="/">← Volver al inicio</a></p>
+  </section>
+</Layout>
+
+<style>
+  .legal {
+    max-width: 800px;
+  }
+  .breadcrumb {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+    margin-bottom: var(--sp-5);
+  }
+  .breadcrumb a:hover { color: var(--azul); }
+  .legal h1 {
+    font-size: 1.9rem;
+    font-weight: 800;
+    margin-bottom: var(--sp-2);
+  }
+  .fecha {
+    color: var(--texto-suave);
+    font-size: 0.85rem;
+    margin-bottom: var(--sp-5);
+  }
+  .legal h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: var(--sp-5);
+    margin-bottom: var(--sp-3);
+  }
+  .legal p {
+    color: #333;
+    margin-bottom: var(--sp-3);
+    line-height: 1.7;
+  }
+  .legal a {
+    color: var(--azul);
+    text-decoration: underline;
+  }
+  .volver {
+    margin-top: var(--sp-6);
+    font-weight: 600;
+  }
+</style>

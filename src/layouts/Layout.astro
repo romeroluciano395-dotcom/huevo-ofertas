@@ -3,7 +3,23 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
 
-const { titulo = 'Huevo Ofertas', descripcion = 'Las mejores ofertas online, elegidas para vos.' } = Astro.props;
+const {
+  titulo = 'Huevo Ofertas',
+  descripcion = 'Las mejores ofertas online de Mercado Libre, elegidas para vos. Tecnología, salud, hogar, belleza y más, todo en un solo lugar.',
+} = Astro.props;
+
+// URL canónica de la página actual (para SEO).
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImagen = new URL('/og.svg', Astro.site).href;
+
+// Datos estructurados (JSON-LD) para que Google entienda el sitio.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Huevo Ofertas',
+  url: Astro.site?.href,
+  description: descripcion,
+};
 ---
 
 <!doctype html>
@@ -11,8 +27,40 @@ const { titulo = 'Huevo Ofertas', descripcion = 'Las mejores ofertas online, ele
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={descripcion} />
+    <meta name="theme-color" content="#ffe600" />
+    <link rel="canonical" href={canonical} />
+
     <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph (WhatsApp, Facebook, etc.) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Huevo Ofertas" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImagen} />
+    <meta property="og:locale" content="es_AR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={titulo} />
+    <meta name="twitter:description" content={descripcion} />
+    <meta name="twitter:image" content={ogImagen} />
+
+    <!-- Performance: conexiones anticipadas -->
+    <link rel="preconnect" href="https://http2.mlstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body>
     <Header />
