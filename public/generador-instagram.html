@@ -83,8 +83,15 @@
       </div>
       <label class="check"><input type="checkbox" id="f-bio" checked /> Mostrar "Link en la bio"</label>
 
-      <button class="btn btn-azul" id="btn-descargar">⬇️ Descargar placa (PNG)</button>
+      <button class="btn btn-azul" id="btn-guardar">📲 Guardar / Compartir placa</button>
+      <button class="mini" id="btn-descargar">⬇️ Descargar (PC)</button>
       <div class="err" id="err"></div>
+      <div id="resultado-box" hidden>
+        <p class="hint" style="margin-top:14px;font-weight:600;color:#1a1a1a">
+          👇 Mantené presionada la imagen y elegí <strong>"Guardar en Fotos"</strong>
+        </p>
+        <img id="resultado" alt="Placa generada" style="width:100%;border-radius:10px;margin-top:8px;border:1px solid var(--borde)" />
+      </div>
     </div>
 
     <div class="previewbox">
@@ -250,13 +257,48 @@ cv.addEventListener('touchend',fin);
 ['f-titulo','f-precio','f-anterior'].forEach(id=>$(id).addEventListener('input',dibujar));
 $('f-bio').addEventListener('change',dibujar);
 
+function nombreArchivo(){
+  return ('huevo-ofertas-'+($('f-titulo').value||'producto')).toLowerCase()
+    .replace(/[^a-z0-9]+/g,'-').slice(0,40)+'.png';
+}
+
+// Muestra la placa como imagen normal: así en el celular se puede
+// mantener presionada y elegir "Guardar en Fotos".
+function mostrarResultado(){
+  try{
+    $('resultado').src=cv.toDataURL('image/png');
+    $('resultado-box').hidden=false;
+    $('resultado-box').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(e){}
+}
+
+// Botón principal: menú nativo de compartir (tiene "Guardar en Fotos").
+$('btn-guardar').addEventListener('click',async()=>{
+  $('err').textContent='';
+  try{
+    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+    const file=new File([blob],nombreArchivo(),{type:'image/png'});
+
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:'Huevo Ofertas'});
+      return;
+    }
+    // Sin API de compartir: mostramos la imagen para guardarla con el dedo
+    mostrarResultado();
+  }catch(e){
+    if(e && e.name==='AbortError') return; // el usuario cerró el menú
+    mostrarResultado();
+  }
+});
+
+// Descarga clásica (sirve en computadora)
 $('btn-descargar').addEventListener('click',()=>{
   try{
     const a=document.createElement('a');
-    a.download=('huevo-ofertas-'+($('f-titulo').value||'producto')).toLowerCase()
-      .replace(/[^a-z0-9]+/g,'-').slice(0,40)+'.png';
+    a.download=nombreArchivo();
     a.href=cv.toDataURL('image/png');
     a.click();
+    mostrarResultado();
   }catch(e){
     $('err').textContent='No se pudo descargar. Probá con otra foto.';
   }
